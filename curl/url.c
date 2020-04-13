@@ -41,6 +41,9 @@ inline int indexOfDomain(unsigned char *url) {
     else if ((i = indexOf(url, ".org")) != -1) {
         return i;
     }
+    else if ((i = indexOf(url, ".ly")) != -1) {
+        return i;
+    }
 
     return -1;
 }

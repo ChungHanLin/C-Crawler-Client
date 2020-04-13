@@ -45,13 +45,14 @@ void sort(Link *link) {
 void load_batch_task(Batch *batch, unsigned char *path) {
     FILE *fp = fopen(path, "r");
     unsigned char buffer[BUFFER_SIZE];
-    
+
     while (fgets(buffer, BUFFER_SIZE, fp)) {
-        if (buffer[strlen(buffer)] == '\n') {
-            buffer[strlen(buffer)] = '\0';
+        if (buffer[strlen(buffer) - 1] == '\n') {
+            buffer[strlen(buffer) - 1] = '\0';
         }
         
         batch->queue[batch->batch_count].url = strdup(buffer);
+        fprintf(stderr, "%s\n", batch->queue[batch->batch_count].url);
         batch->batch_count++;
         if (batch->batch_count == batch->batch_limit) {
             batch->batch_limit *= 2;

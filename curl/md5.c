@@ -9,16 +9,16 @@
 #include "md5.h"
 
 void encode_md5(unsigned char *url, char **md5) {
-    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    unsigned char digest[MD5_DIGEST_LENGTH];
     *md5 = (char *) malloc (33);
 
-    CC_MD5_CTX context;
-    CC_MD5_Init(&context);
-    CC_MD5_Update(&context, url, (CC_LONG)strlen(url));
-    CC_MD5_Final(digest, &context);
+    MD5_CTX context;
+    MD5_Init(&context);
+    MD5_Update(&context, url, strlen(url));
+    MD5_Final(digest, &context);
     
     int i, c;
-    for(i = 0; i < CC_MD5_DIGEST_LENGTH; i++) {
+    for(i = 0; i < MD5_DIGEST_LENGTH; i++) {
         c = (int) digest[i];
         hex_to_char(c, &(*md5)[i * 2], &(*md5)[(i * 2) + 1]);
     }

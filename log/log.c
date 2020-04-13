@@ -94,8 +94,8 @@ void write_log_file(Log log) {
     
     fp = fopen(path, "w");
     fprintf(fp, "Account: %s\n", log.account);
-    fprintf(fp, "Begin time: %s\n", log.begin_time);
-    fprintf(fp, "Finish time: %s\n", log.finish_time);
+    fprintf(fp, "Begin time: %s", log.begin_time);
+    fprintf(fp, "Finish time: %s", log.finish_time);
     if (log.last_crawled_time) {
         fprintf(fp, "Last crawled time: %s\n", log.last_crawled_time);
     }

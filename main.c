@@ -21,7 +21,7 @@
 #include "db/fail_db.h"
 #include "db/seen_db.h"
 
-void extract_content(char *source, unsigned char *target, char *pattern);
+unsigned char *extract_content(char *source, char *pattern);
 
 int find_hash_index(unsigned char *url);
 
@@ -32,7 +32,7 @@ int main(int argc, const char * argv[]) {
     char init_msg[] = "@Initialize: ";
     char recv_buffer[BUFFER_SIZE];
     char send_buffer[BUFFER_SIZE];
-    unsigned char buffer[BUFFER_SIZE];
+    unsigned char *buffer;
     
     time_t time_stamp;
     struct sockaddr_in client_info;
@@ -49,6 +49,10 @@ int main(int argc, const char * argv[]) {
     
     connect_server(clientFD, &client_info);
     
+    // Insert account name
+    printf("Please insert your name: ");
+    scanf("%s", send_buffer);
+
     // The server will ask you to insert account name for the first time (Better in english)
     if (send(clientFD, &send_buffer, BUFFER_SIZE, 0) < 0) {
         perror("send");
@@ -70,7 +74,8 @@ int main(int argc, const char * argv[]) {
         begin_time = localtime(&time_stamp);
         
         fprintf(stderr, "Begin Time: %s\n", asctime(begin_time));
-        
+        log.begin_time = strdup(asctime(begin_time));
+
         if (recv(clientFD, &recv_buffer, BUFFER_SIZE, 0) < 0) {
             perror("recv");
             exit(EXIT_FAILURE);
@@ -78,9 +83,9 @@ int main(int argc, const char * argv[]) {
         
         fprintf(stderr, "Initialization... ");
         // start crawling form the init url
-        if (strstr(init_msg, recv_buffer)) {
+        if (strstr(recv_buffer, init_msg)) {
             // collect link from first url
-            extract_content(recv_buffer, buffer, init_msg);
+            buffer = extract_content(recv_buffer, init_msg);
             if ((res_code = curl_site(buffer, &link, 0) != 0)) {
                 fprintf(stderr, "ERRORL Url access failed.\n");
             }
@@ -93,8 +98,9 @@ int main(int argc, const char * argv[]) {
             force_write_batch_task(&batch, &link);
         }
         // crawling from the file
-        else if (strstr(path_msg, recv_buffer)) {
-            extract_content(recv_buffer, buffer, path_msg);
+        else if (strstr(recv_buffer, path_msg)) {
+            fprintf(stderr, "crawling from the file\n");
+            buffer = extract_content(recv_buffer, path_msg);
             // load link queue
             load_batch_task(&batch, buffer);
         }
@@ -121,7 +127,7 @@ int main(int argc, const char * argv[]) {
         fprintf(stderr, "Finish Time: %s\n", asctime(end_time));
         fprintf(stderr, "Generating log file... ");
         // Writing log file
-        log.begin_time = strdup(asctime(begin_time));
+        
         log.finish_time = strdup(asctime(end_time));
         log.recent_crawled_cnt = seen_db.size;
         log.recent_fail_cnt = fail_db.size;
@@ -153,13 +159,16 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 
-void extract_content(char *source, unsigned char *target, char *pattern) {
+unsigned char *extract_content(char *source, char *pattern) {
+    char buffer[BUFFER_SIZE];
     int i, j;
     
     for (i = strlen(pattern), j = 0; source[i] != '\0'; i++, j++) {
-        target[j] = source[i];
+        buffer[j] = source[i];
     }
-    target[j] = '\0';
+    buffer[j] = '\0';
+    unsigned char *content = strdup(buffer);
+    return content;
 }
 
 int find_hash_index(unsigned char *url) {
