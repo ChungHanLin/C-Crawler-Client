@@ -26,6 +26,7 @@ int curl_site(unsigned char *url, Link *link, unsigned int depth) {
             // Extract attribute
             fprintf(stderr, "Current: %s\n", url);
             success = extract_attribute(html_content, link, url, depth);
+            
             if (!success) {
                 // Add url in to the fail_db
                 return -1;

@@ -15,6 +15,7 @@
 
 #include "url.h"
 #include "md5.h"
+#include "upload.h"
 #include "../struct.h"
 #include "../search.h"
 #include "curl_struct.h"

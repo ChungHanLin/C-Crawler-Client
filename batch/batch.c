@@ -66,23 +66,25 @@ void load_batch_task(Batch *batch, unsigned char *path) {
 void force_write_batch_task(Batch *batch, Link *link) {
     int i, j = 0;
     
-    batch->queue[j].url = strdup(link->store_content[0].url);
-    
-    // Filtering same url, because after sorting same url will be put together.
-    for (i = 1; i < link->link_count; i++) {
-        if (strcmp(batch->queue[j].url, link->store_content[i].url) == 0) {
-            continue;
+    if (link->link_count != 0) {
+        batch->queue[j].url = strdup(link->store_content[0].url);
+        
+        // Filtering same url, because after sorting same url will be put together.
+        for (i = 1; i < link->link_count; i++) {
+            if (strcmp(batch->queue[j].url, link->store_content[i].url) == 0) {
+                continue;
+            }
+            j++;
+            batch->queue[j].url = strdup(link->store_content[i].url);
+            if (j == batch->batch_limit) {
+                batch->batch_limit *= 2;
+                batch->queue = (Connect *) realloc(batch->queue, batch->batch_limit * sizeof(Connect));
+            }
         }
-        j++;
-        batch->queue[j].url = strdup(link->store_content[i].url);
-        if (j == batch->batch_limit) {
-            batch->batch_limit *= 2;
-            batch->queue = (Connect *) realloc(batch->queue, batch->batch_limit * sizeof(Connect));
-        }
+        batch->batch_count = j;
+        destruct_link(&(*link));
+        init_link(&(*link));
     }
-    batch->batch_count = j;
-    destruct_link(&(*link));
-    init_link(&(*link));
 }
 
 void destruct_link(Link *link) {

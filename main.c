@@ -86,6 +86,7 @@ int main(int argc, const char * argv[]) {
         if (strstr(recv_buffer, init_msg)) {
             // collect link from first url
             buffer = extract_content(recv_buffer, init_msg);
+
             if ((res_code = curl_site(buffer, &link, 0) != 0)) {
                 fprintf(stderr, "ERRORL Url access failed.\n");
             }

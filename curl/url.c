@@ -52,6 +52,9 @@ bool legal_link_format(unsigned char *url) {
     if (strstr(url, "javascript:")) {
         return false;
     }
+    else if (strstr(url, "mailto")) {
+        return false;
+    }
     else if (strstr(url, "#")) {
         return false;
     }

@@ -54,17 +54,25 @@ bool extract_attribute(string html_content, Link *link, unsigned char *url, unsi
     
     tag.title.store_content = search_article(html_content, tag.title, (unsigned char *) "</title>");
     tag.img.store_content = search_attr(html_content, tag.img, (unsigned char *) "content=\"");
-    tag.url.store_content = search_attr(html_content, tag.url, (unsigned char *) "content=\"");
+    tag.url.store_content = strdup(url);
     tag.p.store_content = search_article(html_content, tag.p, (unsigned char *) "</p>");
-    if (tag.p.store_content == '\0') {
+    if (tag.p.store_content[0] == '\0' || tag.title.store_content[0] == '\0') {
         tag_destructor(&tag);
         return false;
     }
-    
-    if (depth + 1 < MAX_LINK_DEPTH) {
-        search_link(html_content, url, depth, &link,(unsigned char *) "href=\"");
+    else{
+        if (depth + 1 < MAX_LINK_DEPTH) {
+            search_link(html_content, url, depth, &link,(unsigned char *) "href=\"");
+            // fprintf(stderr, "hi\n");
+        }
+        fprintf(stderr, "Upload to db ");
+        
+        upload_to_db(tag);
+
+        fprintf(stderr, "back\n");
+
+        tag_destructor(&tag);
     }
-    tag_destructor(&tag);
     
     return true;
 }
@@ -259,6 +267,7 @@ void search_link(string html_content, unsigned char *s_url, unsigned int depth, 
         if (status) {
             (*link)->link_count++;
             if ((*link)->link_count == (*link)->link_limit) {
+                fprintf(stderr, "double size link memory\n\n");
                 (*link)->link_limit *= 2;
                 (*link)->store_content = (Connect *) realloc((*link)->store_content, (*link)->link_limit * sizeof(Connect));
             }
