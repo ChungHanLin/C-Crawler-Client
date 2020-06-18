@@ -18,6 +18,7 @@
 
 #include "../struct.h"
 #include "../batch/batch_struct.h"
+#include "tag.h"
 
 int curl_site(unsigned char *, Link *link, unsigned int depth);
 

@@ -52,7 +52,6 @@ void load_batch_task(Batch *batch, unsigned char *path) {
         }
         
         batch->queue[batch->batch_count].url = strdup(buffer);
-        fprintf(stderr, "%s\n", batch->queue[batch->batch_count].url);
         batch->batch_count++;
         if (batch->batch_count == batch->batch_limit) {
             batch->batch_limit *= 2;
